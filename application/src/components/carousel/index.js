@@ -11,13 +11,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     carouselImage: {
-      width: 150,
-      height: 150,
-    },
-    button:{
-        width:15,
-        height: 100,
-        justifyContent: 'flex-end'
+      width: 200,
+      height: 200,
     },
   });
 
@@ -33,25 +28,25 @@ const Carousel = () => {
             const previousIndex = parseInt( await AsyncStorage.getItem('carouselSourceIndex'))
             if(previousIndex)setIndex(previousIndex)
         }catch(e){
-            console.error(e)
+            console.error(e.message)
         }
     }
-
-    useEffect(()=>{getIndex()},[])
-
-    useEffect(()=>{
-        try{
+    
+    function getImages(){
         setLoading(true)
-        fetch(endPoint)
-        .then(res=>res.json())
-        .then(res=>{
-            setCarouselSource(res)
-            setLoading(false)
-        })
+        try{
+            fetch(endPoint)
+            .then(res=>res.json())
+            .then(res=>{
+                setCarouselSource(res)
+                setLoading(false)
+            })
         }catch(e){
-            console.error(e)
+            console.error(e.message)
         }
-    },[])
+    }    
+
+    useEffect(()=>{[getIndex(),getImages()]},[])
 
     useEffect(()=>{AsyncStorage.setItem('carouselSourceIndex', JSON.stringify(index))},[index])
 
@@ -67,20 +62,19 @@ const Carousel = () => {
                     onPress={()=>{setIndex(index-1)}}
                     title="Prev"
                     color= "#29B026"
-                    buttonStyle={styles.button}
                     disabled={index===0}
                 />
                 <View>
                     <Image
                     style ={styles.carouselImage}
                     source={{uri: carouselSource[index].image}}
-                    />            
+                    />
+                    <Text style={{textAlign:'center'}}>{carouselSource[index].title}</Text>            
                 </View>
                 <Button
                     onPress={()=>{setIndex(index+1)}}
-                    color= "#29B026"
-                    buttonStyle={styles.button}
                     title="Next"
+                    color= "#29B026"
                     disabled={index===carouselSource.length-1} 
                 />
             </View>
