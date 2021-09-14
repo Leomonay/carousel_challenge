@@ -40,3 +40,4 @@ In /Application, start the app with **npm start** or **expo start**.
 In your device scan the QR code, or in a Android Emulator, copy link from Expo web.
 
 Here is a video of the app working:
+[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://github.com/Leomonay/carousel_challenge/blob/main/video/2021-09-14-1548-09.mp4)
