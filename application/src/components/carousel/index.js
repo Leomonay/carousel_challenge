@@ -74,6 +74,7 @@ const Carousel=(props)=>{
     return (
         <View style={styles.container, display}>
             <FlatList
+                style={display}
                 horizontal={true}
                 pagingEnabled={true}
                 data={data}
@@ -81,8 +82,16 @@ const Carousel=(props)=>{
                 keyExtractor={(item)=>item.title}
                 onLayout={()=>flatListRef.current.scrollToIndex({index: index,animated: false})}
                 renderItem={({item}) =>
-                <View>
-                  <Image key={item.title} style={styles.image, display} source={{uri: item.image}}/>
+                <View style={display}>
+                  <Image
+                    key={item.title}
+                    style={
+                    {width: '100%',
+                    height: '70%',
+                    borderRadius: 10,
+                    borderColor:'grey',
+                    borderWidth: 4}}
+                    source={{uri: item.image}}/>
                   <Text style={styles.frame}>{item.title}</Text>
                 </View>
                 }
@@ -106,16 +115,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   frame:{
-    textAlign: 'center'
-  },
-  image: {    
-    flex: 1,
-    borderWidth: 1,
-    borderColor: 'grey',
+    textAlign: 'center',
   },
   buttonContainer:{
     flexDirection:'row',
-    justifyContent: 'space-evenly'
+    justifyContent: 'space-evenly',
+    margin: 10
   },
   button:{
     borderColor: 'grey',
