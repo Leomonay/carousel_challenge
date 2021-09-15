@@ -40,3 +40,5 @@ In /Application, start the app with **npm start** or **expo start**.
 In your device scan the QR code, or in a Android Emulator, copy link from Expo web.
 
 Here is a video of the app working:
+
+[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/t0oW90is2qg)
