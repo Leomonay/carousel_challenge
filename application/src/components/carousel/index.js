@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { Text, Image, View, StyleSheet, Button, Animated } from 'react-native';
+import { Text, View, StyleSheet, Button, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import appConfig from '../../../config'
 
@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
     },
+    
     carouselImage: {
         position: 'absolute',
         top: 0,
@@ -129,45 +130,43 @@ const Carousel = () => {
     }
     console.log
     return (
-        <View>
-            <View style={styles.container}>
-                <Button
-                    onPress={()=>{setIndex(index-1)}}
-                    title="Prev"
-                    color= "#29B026"
-                    disabled={index===0}
-                />
-                <View style={{flexDirection: 'row'}}>
-                    <Animated.Image id='View1'
-                            source={{uri: carouselSource[0].image}}
-                            style={styles.carouselImage,
-                            {right: innerRightFirst,
-                            width: innerWidthFirst,
-                            height: carouselWidth,
-                            backgroundColor: 'black'}}>
-                    </Animated.Image>
-                    <Animated.Image id='View2'
-                            source={{uri: carouselSource[1].image}}
-                            style={styles.carouselImage,{
-                            right: innerRightSecond,
-                            width: innerWidthSecond,
-                            height: carouselWidth}}/>
-                    <Animated.Image id='View3'
-                            source={{uri: carouselSource[2].image}}
-                            style={styles.carouselImage,
-                            {right: innerRightThird,
-                            width: innerWidthThird,
-                            height: carouselWidth,
-                            backgroundColor: 'black'}
-                        }/>
-                </View>
-                <Button
-                    onPress={()=>{setIndex(index+1)}}
-                    title="Next"
-                    color= "#29B026"
-                    disabled={index===carouselSource.length-1} 
-                />
+        <View style={styles.container}>
+            <Button
+                onPress={()=>{setIndex(index-1)}}
+                title="Prev"
+                color= "#29B026"
+                disabled={index===0}
+            />
+            <View style={{flexDirection: 'row'}}>
+                <Animated.Image id='View1'
+                        source={{uri: carouselSource[0].image}}
+                        style={styles.carouselImage,
+                        {right: innerRightFirst,
+                        width: innerWidthFirst,
+                        height: carouselWidth,
+                        backgroundColor: 'black'}}>
+                </Animated.Image>
+                <Animated.Image id='View2'
+                        source={{uri: carouselSource[1].image}}
+                        style={styles.carouselImage,{
+                        right: innerRightSecond,
+                        width: innerWidthSecond,
+                        height: carouselWidth}}/>
+                <Animated.Image id='View3'
+                        source={{uri: carouselSource[2].image}}
+                        style={styles.carouselImage,
+                        {right: innerRightThird,
+                        width: innerWidthThird,
+                        height: carouselWidth,
+                        backgroundColor: 'black'}
+                    }/>
             </View>
+            <Button
+                onPress={()=>{setIndex(index+1)}}
+                title="Next"
+                color= "#29B026"
+                disabled={index===carouselSource.length-1} 
+            />
         </View>
     );
 }
