@@ -32,7 +32,7 @@ For this challenge, I uploaded the **.env** file, in order to let the reviewer s
 When environment variables are set, start the server it with **npm start** in /server
 
 #### Application
-In Application folder, there is a **config.js** file, where HOST, PORT and endpoint can be set, if you changed the environment variables or if you want to try it in another server.
+In Application folder, there is a **config.js** file, where HOST, PORT and endpoint can be set, if you changed the environment variables or if you want to try it in another server. Host must be the IPv4 address, you can find it in *[Win]+R > cmd > ipconfig*
 
 In /Application, start the app with **npm start** or **expo start**.
 
