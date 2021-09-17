@@ -2,13 +2,17 @@ import React, {useRef,useState, useEffect} from 'react';
 import {View, FlatList, Text, Image, StyleSheet, Button} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import appConfig from '../../../config'
+import loadingGif from '../../../assets/loading.gif'
 
 const {serverHost, serverPort, serverEndPoint} = appConfig
 
 const Carousel=(props)=>{
+
   const endPoint = `${serverHost}:${serverPort}/${serverEndPoint}`
-  const display={width:parseInt(props.width)||300, height: parseInt(props.height)||300}
-  const[data, setData]=useState([{title:'',image:''}])
+  const display={width:parseInt(props.width)||300,height: parseInt(props.height)||300}
+  const imageDisplay={width: display.width,height:parseInt(props.height-30)*.7}
+  const imageFoot={width: display.width,height:parseInt(props.height-30)*.3}
+  const[data, setData]=useState([{title:'', image:null},{title:'', image:null},{title:'', image:null}])
   const[index, setIndex]=useState(0)
   const[loading, setLoading] = useState(true)
 
@@ -64,35 +68,29 @@ const Carousel=(props)=>{
 
     };
     useEffect(()=>console.log('index',index),[index])
-
-  useEffect(()=>{getImages()},[])
-  if(loading){
+    useEffect(()=>{getImages()},[])
+    if(loading){
+      return <View style={[display, styles.imageDisplay]}>
+        <Image style={imageDisplay}></Image>
+        <Text>Loading Images Source</Text>
+      </View>  
+    }
     return (
-      <View><Text>Getting Carousel Data</Text></View>
-    )
-  }
-    return (
-        <View style={styles.container, display}>
+        <View style={display}>
             <FlatList
-                style={display}
                 horizontal={true}
                 pagingEnabled={true}
                 data={data}
                 ref={flatListRef}
-                keyExtractor={(item)=>item.title}
+                keyExtractor={(item, index)=>item.title+index}
                 onLayout={()=>flatListRef.current.scrollToIndex({index: index,animated: false})}
                 renderItem={({item}) =>
-                <View style={display}>
-                  <Image
-                    key={item.title}
-                    style={
-                    {width: '100%',
-                    height: '70%',
-                    borderRadius: 10,
-                    borderColor:'grey',
-                    borderWidth: 4}}
-                    source={{uri: item.image}}/>
-                  <Text style={styles.frame}>{item.title}</Text>
+                <View>
+                  {item.image?<Image key={item.title} style={[styles.imageDisplay,imageDisplay]} source={{uri: item.image}}/>
+                  :<View style={[styles.imageDisplay,imageDisplay]} key={item.title}><Text style={styles.noSourceText}>No images source</Text></View>}
+                  <Text style={[styles.imageFoot, imageFoot]}>
+                    {item.title}
+                  </Text>
                 </View>
                 }
             />
@@ -108,23 +106,41 @@ const Carousel=(props)=>{
             </View>
         </View>
     );    
+
+
+
+
 }
+export default Carousel
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-  },
   frame:{
     textAlign: 'center',
+    backgroundColor: 'darkgrey',
+    color: 'white',
+    borderRadius: 10,
+    height:40
   },
   buttonContainer:{
     flexDirection:'row',
     justifyContent: 'space-evenly',
-    margin: 10
+    marginBottom: 5,
+    marginTop: 5,
+    height: 30
   },
-  button:{
-    borderColor: 'grey',
-    margin: 5,
+  imageDisplay:{
+    marginBottom:0,
+    backgroundColor: '#eeeeee',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noSourceText:{
+    color: 'silver',
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  imageFoot:{
+    color: 'white',
+    backgroundColor: 'grey',
   }
 });
-export default Carousel

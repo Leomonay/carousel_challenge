@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import {Text, StyleSheet, View } from 'react-native';
 import Carousel from './src/components/Carousel/index';
 
 export default function App() {
@@ -19,4 +19,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
 });
