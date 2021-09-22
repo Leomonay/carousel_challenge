@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import {StyleSheet, View } from 'react-native';
-import Carousel from './src/components/Carousel/ScrollView';
+import Carousel from './src/components/Carousel/index';
 
 export default function App() {
     return (
