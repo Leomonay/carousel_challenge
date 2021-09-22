@@ -97,6 +97,7 @@ export default function Carousel (props){
     carouselImage:{
       width: props.width-70||260,
       height: props.height-120||180,
+      top: 0,
       margin: 2,
       marginBottom:0,
       borderTopRightRadius: 10,
@@ -176,6 +177,8 @@ const styles = StyleSheet.create({
     margin: 2,
     marginTop:0,
     height:50,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10
   }

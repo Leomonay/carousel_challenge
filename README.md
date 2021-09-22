@@ -27,7 +27,7 @@ image: [url2]
 #### Server
 In order to send a JSON as the challenge asked, I made a server.
 
-For this challenge, I uploaded the **.env** file, in order to let the reviewer see my variable values. In this file, the server, port and images urls can be set without needing to edit the code. In **index.js** the object is assembled and sent when requested.
+For this challenge, I uploaded the **.env** file, in order to let the reviewer see my variable values. In this file, the server and port can be set without needing to edit the code. In **index.js** the JSON object is sent when requested.
 
 When environment variables are set, start the server it with **npm start** in /server
 
