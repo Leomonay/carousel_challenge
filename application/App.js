@@ -1,12 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import {Text, StyleSheet, View } from 'react-native';
-import Carousel from './src/components/Carousel/index';
+import {StyleSheet, View } from 'react-native';
+import Carousel from './src/components/Carousel/ScrollView';
 
 export default function App() {
     return (
     <View style={styles.container}>
-      <Carousel width='300' height='300' />
+      <Carousel/>
       <StatusBar style="auto" />
     </View>
   );

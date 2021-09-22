@@ -1,146 +1,184 @@
-import React, {useRef,useState, useEffect} from 'react';
-import {View, FlatList, Text, Image, StyleSheet, Button} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, {useEffect, useRef, useState } from 'react'
+import { View, Animated, StyleSheet, Button, Image, Text } from 'react-native'
 import appConfig from '../../../config'
-import loadingGif from '../../../assets/loading.gif'
 
 const {serverHost, serverPort, serverEndPoint} = appConfig
 
-const Carousel=(props)=>{
-
+export default function Carousel (props){
   const endPoint = `${serverHost}:${serverPort}/${serverEndPoint}`
-  const display={width:parseInt(props.width)||300,height: parseInt(props.height)||300}
-  const imageDisplay={width: display.width,height:parseInt(props.height-30)*.7}
-  const imageFoot={width: display.width,height:parseInt(props.height-30)*.3}
-  const[data, setData]=useState([{title:'', image:null},{title:'', image:null},{title:'', image:null}])
-  const[index, setIndex]=useState(0)
-  const[loading, setLoading] = useState(true)
 
-  async function getIndex(){
-      try{
-          const previousIndex = parseInt( await AsyncStorage.getItem('carouselSourceIndex'))
-          if(previousIndex){
-              console.log('previousIndex',previousIndex)
-              setIndex(previousIndex)
-              console.log('hook', index)
-          }
-      }catch(e){
-          console.error(e.message)
+  const [timing, setTiming]=useState(0)
+  const [current,setCurrent] = useState(1)
+  const [position,setPosition] = useState(0)
+  const [source, setSource]=useState([{'':''}])
+  const moveAnim = useRef(new Animated.Value(0)).current
+
+  async function getCurrent(){
+      let previousCurrent = await AsyncStorage.getItem('carouselSourceIndex')
+      if(previousCurrent){
+        setCurrent(parseInt (previousCurrent))
+      }else{
+        setCurrent(1)
       }
-  }
-  useEffect(()=>{getIndex()},[])
-  useEffect(()=>{AsyncStorage.setItem('carouselSourceIndex', JSON.stringify(index))},[index])
-
-    function getImages(){
-      setLoading(true)
       try{
-        fetch(endPoint)
+      fetch(endPoint)
         .then(res=>res.json())
         .then(res=>{
-            setData(res)
-            setLoading(false)
+            setSource(res)
+            setTiming(700)
+        })
+        .catch(e=>{
+          console.error(e)
+          setTiming(700)
         })
       }catch(e){
-        console.error(e.message)
+        console.error(e)
       }
-    }    
+  }
 
-    let flatListRef = useRef(null);
-    
-    const scrollNext = () => {
-      if (index !== data.length - 1) {
-        flatListRef.current.scrollToIndex({
-          index: index + 1,
-          animated: true,
-        });
-      }
-      setIndex(index+1)
-    };
-    const scrollPrevious = () => {
-      if (index !== 0) {
-        flatListRef.current.scrollToIndex({
-          index: index - 1,
-          animated: true,
-        });
-      }
+  useEffect(()=>{getCurrent()},[])
 
-      setIndex(index-1)
+  const animatedStyle = {
+    transform: [{translateX: moveAnim}]
+  }
+  
+  useEffect(()=>{
+    Animated.timing(
+      moveAnim,{
+        toValue: position,
+        duration: timing,
+        useNativeDriver:true
+      }).start();
+  },[position])
 
-    };
-    useEffect(()=>console.log('index',index),[index])
-    useEffect(()=>{getImages()},[])
-    if(loading){
-      return <View style={[display, styles.imageDisplay]}>
-        <Image style={imageDisplay}></Image>
-        <Text>Loading Images Source</Text>
-      </View>  
-    }
-    return (
-        <View style={display}>
-            <FlatList
-                horizontal={true}
-                pagingEnabled={true}
-                data={data}
-                ref={flatListRef}
-                keyExtractor={(item, index)=>item.title+index}
-                onLayout={()=>flatListRef.current.scrollToIndex({index: index,animated: false})}
-                renderItem={({item}) =>
-                <View>
-                  {item.image?<Image key={item.title} style={[styles.imageDisplay,imageDisplay]} source={{uri: item.image}}/>
-                  :<View style={[styles.imageDisplay,imageDisplay]} key={item.title}><Text style={styles.noSourceText}>No images source</Text></View>}
-                  <Text style={[styles.imageFoot, imageFoot]}>
-                    {item.title}
-                  </Text>
-                </View>
-                }
-            />
-            <View style={styles.buttonContainer}>
-            <Button style={styles.button}
-            onPress={()=>scrollPrevious()} 
-            disabled={index===0} 
-            title='PREV'/>
-            <Button style={styles.button}
-            onPress={()=>scrollNext()}
-            disabled={index === data.length - 1} 
-            title='NEXT'/>
+  function calculatePosition(){
+    let width = innerStyles.carouselImage.width 
+    let margin = innerStyles.carouselImage.margin
+    let viewerWidth = innerStyles.frame.width
+    let border = innerStyles.frame.borderWidth
+    if (current == 0)return (viewerWidth/2-(width/2+margin))-border
+    let firstStep = -(3*margin+1.5*width-viewerWidth/2)-border
+    if (current == 1) return firstStep
+    if (current==source.length-1) return -((width+2*margin)*(current-1)-firstStep-3*margin)
+    return firstStep-(width+2*margin)*(current-1)
+  }
+
+  function next(){
+    setCurrent(current+1)
+  }
+  function previous(){
+    setCurrent(current-1)
+  }
+  async function newCurrent(){
+    setPosition(calculatePosition())
+    await AsyncStorage.setItem('carouselSourceIndex', JSON.stringify(current))
+  }
+  useEffect(() => {newCurrent()}, [current])
+  
+  const innerStyles = StyleSheet.create({
+    frame:{
+      overflow: 'hidden',
+      width: props.width||350,
+      height: props.height||350,
+      borderColor: 'black',
+      borderStyle: 'solid',
+      borderWidth: 10,
+      borderRadius: 10,
+      borderBottomWidth: 0
+    },
+    innerFrame:{
+      position: 'absolute',
+      left: timing==0?position:0,
+      height: props.height-50||300,
+      alignItems : 'center',
+      flexDirection: 'row',
+    },
+    carouselImage:{
+      width: props.width-70||260,
+      height: props.height-120||180,
+      margin: 2,
+      marginBottom:0,
+      borderTopRightRadius: 10,
+      borderTopLeftRadius: 10,
+    },
+  });
+
+  return (
+    <View style={styles.container}>
+      <View style={innerStyles.frame}>
+        <Animated.View style={
+          timing==0?
+          innerStyles.innerFrame
+          :[innerStyles.innerFrame,animatedStyle]}
+        >
+          {source.map((item,index)=>{
+            if(!item.image){
+              return <View key={'noImage'+index}
+              style={[innerStyles.carouselImage,
+              {backgroundColor: '#E5E8E8',
+              alignItems: 'center',
+              justifyContent: 'center' },
+              ]}>
+                <Text>No image source detected</Text>
+              </View>}
+          return <View key={'view'+index} 
+            style={{transform: [{ scale: index==current?1:.9 }]}}>
+          
+              <Image
+                key={'image'+index}
+                style={[innerStyles.carouselImage]}
+                source={{uri: item.image}}/>
+              <Text key={'title'+index} style={styles.imageText}>{item.title}</Text>
             </View>
+          }
+          )}
+        </Animated.View>
+        <View style={styles.buttons}>
+          <Button
+            title='PREVIOUS'
+            onPress={()=>previous()}
+            disabled={current==0}
+            />
+          <Button
+            title='     NEXT     '
+            onPress={()=>next()}
+            disabled={current==source.length-1}/>
         </View>
-    );    
-
-
-
-
+      </View>
+    </View>
+  );
 }
-export default Carousel
 
 const styles = StyleSheet.create({
-  frame:{
-    textAlign: 'center',
-    backgroundColor: 'darkgrey',
-    color: 'white',
-    borderRadius: 10,
-    height:40
-  },
-  buttonContainer:{
-    flexDirection:'row',
-    justifyContent: 'space-evenly',
-    marginBottom: 5,
-    marginTop: 5,
-    height: 30
-  },
-  imageDisplay:{
-    marginBottom:0,
-    backgroundColor: '#eeeeee',
-    alignItems: 'center',
+  container: {
+    flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    alignContent: 'center',
+    backgroundColor: '#FFFFFF',
   },
-  noSourceText:{
-    color: 'silver',
-    fontSize: 20,
-    fontWeight: 'bold'
+  buttons: {
+    flex:1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    position:'absolute',
+    bottom: 0,
+    width: '100%',
+    height: 50,
+    backgroundColor: '#0D0D0D',
+    alignSelf: 'center',
   },
-  imageFoot:{
-    color: 'white',
-    backgroundColor: 'grey',
+  imageText:{
+    padding:2,
+    backgroundColor: '#E5E8E8',
+    margin: 2,
+    marginTop:0,
+    height:50,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10
   }
 });
+
+

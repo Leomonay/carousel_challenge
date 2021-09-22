@@ -41,4 +41,4 @@ In your device scan the QR code, or in a Android Emulator, copy link from Expo w
 
 Here is a video of the app working:
 
-[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/Sao_R7dnc6E)
+[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/mUVNxDwztSI)
